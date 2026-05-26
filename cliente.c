@@ -100,44 +100,28 @@ int main() {
             // limpa a tela do terminal enviando codigos de escape ansi para redesenhar o proximo frame
             printf("\033[H\033[J");
 
-            // exibe o cabecalho de informacoes da partida
-            printf("--- ARENA TRON ---\n");
+            // informacoes da partida
+            printf("--- ARENA TRON --- [Conectados: %d | Vivos: %d]\n", estado.num_jogadores_conectados, estado.num_jogadores_vivos);
 
-            // mostra informacoes sobre conexoes e sobreviventes no topo
-            printf(" Conectados: %d | ", estado.num_jogadores_conectados);
-            printf("Vivos: %d\n", estado.num_jogadores_vivos);
-
-            // analisa e exibe a situacao atual da rodada
+            // status da partida
             if (estado.estado_partida == 0) {
-                printf(" Status: AGUARDANDO JOGADORES...\n");
-                if (estado.contagem_regressiva > 0) {
-                    printf(" Comecando em: %d segundos\n", estado.contagem_regressiva);
-                } else {
-                    printf(" Aguardando pelo menos 2 jogadores para iniciar...\n");
-                }
+                if (estado.contagem_regressiva > 0) printf(" Status: INICIANDO EM %d SEGUNDOS...\n", estado.contagem_regressiva);
+                else printf(" Status: AGUARDANDO JOGADORES (Minimo 2 para iniciar)...\n");
             } 
             else if (estado.estado_partida == 1) {
-                printf(" Status: PARTIDA EM ANDAMENTO!\n");
-                printf("\n");
+                if (estado.jogadores[meu_id].status == 0) printf(" Status: VOCE FOI ELIMINADO! Aguarde a rodada acabar.\n");
+                else printf(" Status: EM JOGO! (Controles: W, A, S, D | Sair: Q)\n");
             } 
             else if (estado.estado_partida == 2) {
-                printf(" Status: RODADA ENCERRADA!\n");
-                if (estado.vencedor_id != -1) {
-                    printf(" VENCEDOR: Jogador %d venceu a rodada!\n", estado.vencedor_id + 1);
-                } else {
-                    printf(" RESULTADO: EMPATE GERAL! Todos colidiram.\n");
-                }
-                printf(" Pressione R para reiniciar a partida!\n");
+                if (estado.vencedor_id != -1) printf(" Status: VENCEDOR MOTO %d! (Aperte R para recomecar ou Q para sair)\n", estado.vencedor_id + 1);
+                else printf(" Status: EMPATE GERAL! (Aperte R para recomecar ou Q para sair)\n");
             }
-
-            printf("\n");
 
             // renderiza a arena de jogo bidimensional de tamanho 40 colunas por 20 linhas
             for (int y = 0; y < 20; y++) {
                 for (int x = 0; x < 40; x++) {
                     int desenhou_algo = 0;
 
-                    // verifica se existe algum jogador vivo nesta coordenada especifica da arena para desenha-lo
                     for (int i = 0; i < MAX_JOGADORES; i++) {
                         if (estado.jogadores[i].status == 1 && estado.jogadores[i].pos_x == x && estado.jogadores[i].pos_y == y) {
                             printf("%d", i + 1);
@@ -146,7 +130,6 @@ int main() {
                         }
                     }
 
-                    // se nao houver nenhum jogador na coordenada, verifica se ha um rastro desenhado naquela posicao da matriz
                     if (!desenhou_algo) {
                         int rastro = estado.arena[y][x];
                         if (rastro != 0) {
@@ -155,32 +138,16 @@ int main() {
                         }
                     }
 
-                    // se nao desenhou jogador nem rastro, decide se desenha a parede delimitadora ou o chao livre
                     if (!desenhou_algo) {
-                        if (y == 0 || y == 19 || x == 0 || x == 39) {
-                            // desenha o caractere # representando os limites fisicos das paredes externas do mapa
-                            printf("#");
-                        } else {
-                            printf(" "); // desenha o chao vazio para espaco livre de movimentacao
-                        }
+                        if (y == 0 || y == 19 || x == 0 || x == 39) printf("#");
+                        else printf(" ");
                     }
                 }
-                printf("\n"); // quebra de linha para avancar para a proxima linha da matriz do mapa
+                printf("\n"); 
             }
-
-            // exibe o painel de mensagens e alertas no rodape do jogo
-            printf("\n");
-            // envia aviso na tela se o jogador local foi derrotado por colisao nesta rodada
-            if (estado.estado_partida == 1 && estado.jogadores[meu_id].status == 0) {
-                printf(" VOCE FOI ELIMINADO! AGUARDANDO PROXIMA RODADA...\n");
-            } else if (estado.estado_partida == 1) {
-                printf(" CONTROLES: W, A, S, D \n");
-            }
-            if (estado.estado_partida == 2) {
-                printf(" Pressione R para recomecar ou Q para sair.\n");
-            } else {
-                printf(" Pressione Q para desconectar e sair.\n");
-            }
+            
+            // Força o sistema operacional a imprimir tudo instantaneamente na tela sem esperar o buffer
+            fflush(stdout); 
         }
     }
 

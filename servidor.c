@@ -155,6 +155,21 @@ int main() {
             }
         }
 
+        // calculo de jogadores conectados e vivos
+        int conectados = 0;
+        int vivos = 0;
+        for (int i = 0; i < MAX_JOGADORES; i++) {
+            if (clientes[i] > 0) {
+                conectados++;
+                if (estado_atual.jogadores[i].status == 1) {
+                    vivos++;
+                }
+            }
+        }
+        estado_atual.num_jogadores_conectados = conectados;
+        estado_atual.num_jogadores_vivos = vivos;
+        // =========================================================================
+
         // varre o vetor de descritores de sockets dos clientes conectados para verificar se algum deles enviou uma acao pelo teclado
         for (int i = 0; i < MAX_JOGADORES; i++) {
             int sd = clientes[i];
@@ -224,20 +239,6 @@ int main() {
                 }
             }
         }
-
-        // bloco de controle de transicao de estados (maquina de estados) que calcula dados de jogadores conectados e vivos
-        int conectados = 0;
-        int vivos = 0;
-        for (int i = 0; i < MAX_JOGADORES; i++) {
-            if (clientes[i] > 0) {
-                conectados++;
-                if (estado_atual.jogadores[i].status == 1) {
-                    vivos++;
-                }
-            }
-        }
-        estado_atual.num_jogadores_conectados = conectados;
-        estado_atual.num_jogadores_vivos = vivos;
 
         // estado 0: gerencia o estado inicial de espera, iniciando a contagem de 5 segundos se houver pelo menos dois competidores conectados
         if (estado_atual.estado_partida == 0) {
