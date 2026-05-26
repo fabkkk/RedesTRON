@@ -1,4 +1,4 @@
-# RedesTRON
+# redesTRON
 
 Este repositório contém o código-fonte para o **redesTRON**, um jogo multiplayer em tempo real desenvolvido sobre sockets de rede usando a linguagem C (POSIX). O projeto é o primeiro trabalho prático avaliativo da disciplina Redes de Computadores I.
 
